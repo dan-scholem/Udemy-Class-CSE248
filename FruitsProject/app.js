@@ -34,17 +34,23 @@ mongoose.connect("mongodb://localhost:27017/fruitsDB", { useNewUrlParser: true, 
 
 //Replaces insertDocuments
 const fruitSchema = new mongoose.Schema ({
-  name: String,
-  rating: Number,
+  name: {
+    type: String,
+    required: [true, "Fruit name required"]
+  },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 10
+  },
   review: String
 });
 
 const Fruit = mongoose.model("Fruit", fruitSchema);
 
 const fruit = new Fruit ({
-  name: "Apple",
-  rating: 7,
-  review: "Pretty solid as a fruit"
+  rating: 10,
+  review: "Peaches are so yummy"
 });
 
 //fruit.save();
@@ -52,43 +58,61 @@ const fruit = new Fruit ({
 //Challenge
 const personSchema = new mongoose.Schema ({
   name: String,
-  age: Number
+  age: Number,
+  favoriteFruit: fruitSchema
 });
 
 const Person = mongoose.model("Person", personSchema);
 
-const person = new Person ({
-  name: "John",
-  age: 26
+const mango = new Fruit({
+  name: "Mango",
+  score: 6,
+  review: "Decent fruit"
+})
+
+mango.save();
+
+Person.updateOne({name: "John"}, {favoriteFruit: mango}, function(err){
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Successfully updated the document");
+    }
 });
+
+// const person = new Person ({
+//   name: "Amy",
+//   age: 12,
+//   favoriteFruit: pineapple
+// });
 
 //person.save();
 
-const kiwi = new Fruit({
-  name: "Kiwi",
-  rating: 8,
-  review: "I come from the land down unda"
-});
+// const kiwi = new Fruit({
+//   name: "Kiwi",
+//   rating: 8,
+//   review: "I come from the land down unda"
+// });
+//
+// const orange = new Fruit ({
+//   name: "Orange",
+//   rating: 7,
+//   review: "Tart yet delicious"
+// });
+//
+// const banana = new Fruit ({
+//   name: "Banana",
+//   rating: 9,
+//   review: "Gimme some peanut butter"
+// });
 
-const orange = new Fruit ({
-  name: "Orange",
-  rating: 7,
-  review: "Tart yet delicious"
-});
-
-const banana = new Fruit ({
-  name: "Banana",
-  rating: 9,
-  review: "Gimme some peanut butter"
-});
-
-Fruit.insertMany([kiwi, orange, banana], function(err){
-  if (err) {
-    console.log(err);
-  } else {
-    console.log("Successfully saved all the fruits to fruitsDB");
-  }
-});
+// Fruit.insertMany([kiwi, orange, banana], function(err){
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     console.log("Successfully saved all the fruits to fruitsDB");
+//   }
+// });
 
 // const insertDocuments = function(db, callback) {
 //   // Get the documents collection
@@ -114,6 +138,53 @@ Fruit.insertMany([kiwi, orange, banana], function(err){
 //     callback(result);
 //   });
 // }
+
+
+Fruit.find(function(err, fruits){
+  if (err) {
+    console.log(err);
+  } else {
+    //console.log(fruits);
+    mongoose.connection.close();
+    fruits.forEach(function(fruit){
+      console.log(fruit.name);
+    });
+  }
+});
+
+// Fruit.updateOne({_id: "5f25a0dbd370743af874be99"}, {name: "Peach"}, function(err){
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     console.log("Successfully updated the document");
+//   }
+// });
+
+//Can use any identifier
+// Fruit.deleteOne({_id: "5f25b04d5fe09b2a90c82e21"}, function(err){
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       console.log("Successfully deleted content");
+//     }
+// });
+//
+// Person.deleteOne({_id: "5f25af79ce018a22380bad61"}, function(err){
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       console.log("Successfully deleted content");
+//     }
+// });
+
+// Person.deleteMany({name: "John"}, function(err){
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       console.log("Successfully deleted content");
+//     }
+// });
+
 
 const findDocuments = function(db, callback) {
   // Get the documents collection
